@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "bsgNoXGawBb+EWVUf/00kU0mkUCR8GUt2BD110orq8E=",
+  "Source": "DemoSignalR",
+  "BasePath": "_content/DemoSignalR",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
