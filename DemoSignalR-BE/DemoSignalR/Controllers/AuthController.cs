@@ -64,7 +64,7 @@ namespace DemoSignalR.Controllers
             }
 
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Username == model.Username);
-            if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash)) // Xác minh mật khẩu
+            if (user == null || (!model.Password.Equals(user.PasswordHash) &&!BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash) )) // Xác minh mật khẩu
             {
                 return Unauthorized(new { Message = "Tên đăng nhập hoặc mật khẩu không đúng." });
             }

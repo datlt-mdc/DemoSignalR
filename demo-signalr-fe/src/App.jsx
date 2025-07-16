@@ -27,6 +27,12 @@ const App = () => {
     const [messageInput, setMessageInput] = useState(''); // Nội dung tin nhắn đang gõ
     const messagesEndRef = useRef(null); // Ref để tự động cuộn xuống tin nhắn mới nhất
 
+    // Ref để lưu trữ giá trị selectedUser hiện tại
+    const selectedUserRef = useRef(selectedUser);
+    useEffect(() => {
+        selectedUserRef.current = selectedUser;
+    }, [selectedUser]);
+
     // Hàm để cuộn xuống cuối danh sách tin nhắn
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -146,14 +152,25 @@ const App = () => {
                     // Đăng ký sự kiện nhận tin nhắn riêng tư
                     connection.on('ReceivePrivateMessage', (senderId, receiverId, content, senderUsername, receiverUsername, timestamp) => {
                         console.log(`Nhận tin: ${content} từ ${senderUsername} (${senderId}) đến ${receiverUsername} (${receiverId})`);
-                        setMessages(prevMessages => [...prevMessages, {
-                            senderId,
-                            receiverId,
-                            content,
-                            senderUsername,
-                            receiverUsername,
-                            timestamp: new Date(timestamp)
-                        }]);
+                        console.log("Dang chat voi (tu ref):", selectedUserRef.current); // Log giá trị từ ref
+
+                        // CHỈ THÊM TIN NHẮN NẾU NÓ THUỘC VỀ CUỘC TRÒ CHUYỆN ĐANG CHỌN
+                        // Sử dụng selectedUserRef.current để lấy giá trị mới nhất
+                        if (selectedUserRef.current && currentUser) {
+                            if (
+                                (senderId === currentUser.userId && receiverId === selectedUserRef.current.id) ||
+                                (senderId === selectedUserRef.current.id && receiverId === currentUser.userId)
+                            ) {
+                                setMessages(prevMessages => [...prevMessages, {
+                                    senderId,
+                                    receiverId,
+                                    content,
+                                    senderUsername,
+                                    receiverUsername,
+                                    timestamp: new Date(timestamp)
+                                }]);
+                            }
+                        }
                     });
 
                     // Đăng ký sự kiện nhận lịch sử tin nhắn
@@ -185,7 +202,7 @@ const App = () => {
                 connection.off('ReceiveError');
             };
         }
-    }, [connection]); // Re-run when connection object changes
+    }, [connection, currentUser]); // selectedUser đã được loại bỏ khỏi dependency array vì chúng ta dùng ref
 
     // --- Fetch Users List ---
     const fetchUsers = useCallback(async () => {
