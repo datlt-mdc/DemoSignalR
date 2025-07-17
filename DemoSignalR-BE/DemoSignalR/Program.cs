@@ -78,8 +78,6 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
     // Áp dụng migrations khi khởi động ứng dụng (chỉ nên dùng trong dev)
     //using (var scope = app.Services.CreateScope())
     //{
@@ -87,6 +85,8 @@ if (app.Environment.IsDevelopment())
     //    dbContext.Database.Migrate(); // Áp dụng tất cả các migrations đang chờ xử lý
     //}
 }
+    app.UseSwagger();
+    app.UseSwaggerUI();
 // Sử dụng CORS policy
 app.UseCors("CorsPolicy");
 
