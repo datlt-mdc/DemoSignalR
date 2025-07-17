@@ -10,8 +10,8 @@ WORKDIR /src
 
 # Copy và restore file .sln và các file .csproj đầu tiên
 # Điều này tận dụng Docker cache hiệu quả hơn
-COPY ["DemoSignalR-BE/DemoSignalR.sln", "./"]
-COPY ["DemoSignalR-BE/DemoSignalR/DemoSignalR.csproj", "DemoSignalR/"]
+COPY ["DemoSignalR.sln", "./"]
+COPY ["DemoSignalR/DemoSignalR.csproj", "DemoSignalR/"]
 
 # Chạy dotnet restore cho toàn bộ solution
 # (Đảm bảo tất cả các package được tải)
