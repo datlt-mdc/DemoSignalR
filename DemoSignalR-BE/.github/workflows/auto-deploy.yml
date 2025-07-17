@@ -1,0 +1,62 @@
+name: CI/CD for .NET Solution (Local Docker)
+
+on:
+  push:
+    branches:
+      - chat-with-login
+  pull_request:
+    branches:
+      - chat-with-login
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted # Chạy trên VPS Linux
+
+    env:
+      IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}
+      DOCKER_PORT: ${{ secrets.DOCKER_PORT }}
+      APP_PORT: ${{ secrets.APP_PORT }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up environment for .NET installation
+        run: |
+          echo "DOTNET_ROOT=$HOME/.dotnet" >> $GITHUB_ENV
+          echo "$HOME/.dotnet:$HOME/.dotnet/tools" >> $GITHUB_PATH
+
+      - name: Install .NET SDK in User Directory (if not installed)
+        run: |
+          if [ ! -d "$HOME/.dotnet" ]; then
+            curl -fsSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --install-dir $HOME/.dotnet --version 8.0.100
+          else
+            echo ".NET SDK is already installed, skipping installation."
+          fi
+
+      - name: Verify .NET installation
+        run: |
+          echo "Dotnet path: $(which dotnet)"
+          dotnet --version
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Build Docker Image
+        run: |
+          docker build -t $IMAGE_NAME:v1 .
+
+      - name: Stop and Remove Old Container (if exists)
+        run: |
+          docker stop $IMAGE_NAME || true
+          docker rm $IMAGE_NAME || true
+
+      - name: Run Docker Container (Inject Connection string Config)
+        run: |
+          docker run -d --name $IMAGE_NAME \
+            -p $DOCKER_PORT:$APP_PORT \
+            -e ConnectionStrings__DefaultConnection="${{ secrets.CONNECTIONSTRING }}" \
+            -e AppSetting__SecretKey="$JWT_SECRET_KEY" \
+            $IMAGE_NAME:v1 
