@@ -36,13 +36,13 @@ jobs:
       - name: Verify .NET installation
         run: |
           echo "Dotnet path: $(which dotnet)"
-          dotnet --version
+          dotnet --version ./DemoSignalR-BE
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore ./DemoSignalR-BE
 
       - name: Build solution
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build --configuration Release --no-restore ./DemoSignalR-BE
 
       - name: Build Docker Image
         run: |
