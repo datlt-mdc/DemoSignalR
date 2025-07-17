@@ -36,7 +36,7 @@ jobs:
       - name: Verify .NET installation
         run: |
           echo "Dotnet path: $(which dotnet)"
-          dotnet --version ./DemoSignalR-BE
+          dotnet --version
 
       - name: Restore dependencies
         run: dotnet restore ./DemoSignalR-BE
